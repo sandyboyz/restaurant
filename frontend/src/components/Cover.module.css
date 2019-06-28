@@ -1,0 +1,70 @@
+.main-container{
+    background-image: url(http://192.168.88.4:3000/images/cover2.jpg);
+    background-size: cover;
+    height: 100vh;
+    overflow: hidden;
+    position:relative;
+}
+
+.jumbotron{
+    background-color: transparent !important;
+    text-align: center;
+    font-size:1.25rem;
+    padding-top: 20px !important;
+    position:absolute;
+    left: 0;
+    width: 100%;
+}
+
+@media (max-height: 480px){
+    .main-container{
+        overflow-y:auto
+    }
+}
+@media (min-width: 476px) {
+    .jumbotron { font-size: 1.5rem; top: 25%; }
+}
+@media (min-width: 768px) {
+    .jumbotron { font-size: 1.7rem; }
+}
+@media (min-width: 992px) {
+    .jumbotron { font-size: 1.8rem; }
+}
+@media (min-width: 1200px) {
+    .jumbotron { font-size: 2rem; }
+}
+
+
+.jumbotron > h4, h5 {
+    font-family: "Kalam";
+}
+
+.jumbotron > h4{
+    letter-spacing: 0.4rem;
+    font-size: 1em;
+}
+.jumbotron > h5{
+    margin-bottom: 20px;
+    font-size: 0.8em;    
+}
+
+.jumbotron > h1 {
+    font-size:2em;
+}
+.jumbotron > p {
+    font-size: 0.8em;
+}
+
+.jumbotron > .button {
+    font-size: .6em;
+    width:auto;
+    padding: .5em 2em;
+}
+
+.jumbotron > h5 > span {
+    font-weight: 700;
+    background: linear-gradient(to bottom, #F00 0%, #000 100%);
+    background-clip: text;
+    color: transparent;
+}
+

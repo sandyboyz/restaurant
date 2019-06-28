@@ -1,0 +1,30 @@
+.container{
+    display:flex;
+    min-height:100vh;
+    justify-content: center;
+    align-items: center;
+    /* background: linear-gradient(to right, #f0c27b, #4b1248); */
+    background: linear-gradient(to left, #b993d6, #8ca6db); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    
+}
+
+.login-box{
+    background-color:rgba(255,255,255,0.7);
+    width:400px;
+    box-shadow: 1px 1px 5px 1px grey; 
+    padding: 80px 40px;
+    border-radius:10px;
+    overflow:hidden;
+    position:relative;
+}
+
+.wrapper h3{
+    text-align:center;
+    margin-bottom:40px;
+}
+@media screen and (max-width:640px){
+    .login-box{
+        width:300px;
+    }
+}
