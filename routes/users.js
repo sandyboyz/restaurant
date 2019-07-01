@@ -14,7 +14,7 @@ Users.findOne({role: 'admin'})
                 .catch(e => console.log(e));
         }
         else {
-            res.json("admin exist")
+            res.status(403).json({msg: "Cannot Create Another Admin"})
         }
     })
     .catch(e => console.log(e))
