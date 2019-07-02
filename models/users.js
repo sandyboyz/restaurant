@@ -1,23 +1,28 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const Counter = require("./counter");
 
 const Users = new Schema({
-    role : {
-        type: String,
-        required: true,
-    },
-    workerID: {
-        type: Number,
-        required: function(){
-            return this.role==="Worker";
-        }
-    },
-    password : {
-        type: String,
-        required: true
+  role: {
+    type: String,
+    required: true
+  },
+  workerID: {
+    type: String,
+    required: function() {
+      return this.role === "worker";
     }
+  },
+  workerName: {
+    type: String,
+    required: function() {
+      return this.role === "worker";
+    }
+  },
+  password: {
+    type: String,
+    required: true
+  }
 });
 
-
-
-module.exports = mongoose.model('Users', Users);
+module.exports = mongoose.model("Users", Users);

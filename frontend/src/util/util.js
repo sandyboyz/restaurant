@@ -3,7 +3,7 @@ import React from 'react';
 import {Redirect, Route} from 'react-router-dom';
 
 
-export const localhost = "http://192.168.88.4:5000";
+export const localhost = "http://192.168.88.7:5000";
 
 export const fetchMainCourses = (activePage, limit) => {
   return axios.get(

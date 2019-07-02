@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const passport = require('passport');
 
 const app = express();
 const http = require('http').Server(app);
@@ -27,8 +28,11 @@ app.use(bodyParser.json());
 const mainfood = require("./routes/mainfood");
 const users = require("./routes/users");
 
+app.use(passport.initialize());
+require('./config/passport')(passport);
+
 app.use('/api', mainfood);
-app.use('/api', users);
+app.use('/api/users', users);
 
 http.listen(port, () => console.log(`App running at port ${port}`));
 
