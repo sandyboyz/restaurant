@@ -1,9 +1,10 @@
 import axios from "axios";
 import React from 'react';
 import {Redirect, Route} from 'react-router-dom';
+import { connect } from "react-redux";
 
 
-export const localhost = "http://192.168.88.7:5000";
+export const localhost = "http://192.168.88.250:5000";
 
 export const fetchMainCourses = (activePage, limit) => {
   return axios.get(
@@ -11,27 +12,17 @@ export const fetchMainCourses = (activePage, limit) => {
   );
 };
 
-export const Auth = {
-  authenticate() {
-    const auth = localStorage.getItem("authenticate")
-    if (auth === "1") return true;
-    else return false;
-  }
-};
 
-export const PrivateRoute = ({ component: Component, ...rest }) => (
-  <Route
-    {...rest}
-    render={props =>
-      Auth.authenticate() ? (
-        <Component {...props} />
-      ) : (
-        <Redirect
-          to={{
-            pathname: "/login"
-          }}
-        />
-      )
-    }
-  />
-);
+const PrivateRoute = ({ component: Component, auth, ...rest }) => (
+  <Route {...rest} render={(props) => (
+    auth.isAuthenticated === true
+      ? <Component {...props} />
+      : <Redirect to='/login' />
+  )} />
+)
+
+const mapStateToProps = state => ({
+  auth: state.auth
+});
+
+export default connect(mapStateToProps)(PrivateRoute);

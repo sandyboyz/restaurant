@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import classes from './Login.module.css';
 import { Link } from 'react-router-dom';
 
@@ -7,32 +8,49 @@ class Login extends Component {
     state = {
         role: 'Admin',
         workerID: '',
-        password : '',
+        password : ''
     }
     changeInput = (e) => {
         this.setState({
             [e.target.name] : e.target.value
         });
-           
     }
 
+    componentWillReceiveProps(nextProps){
+        if (nextProps.auth.isAuthenticated){
+            this.props.history.push('/dashboard');
+        }
+    }
+    componentDidMount(){
+        if (this.props.auth.isAuthenticated){
+            this.props.history.push('/dashboard');
+        }
+    }
     componentDidUpdate(prevProps, prevState){
         if (prevState.role !== this.state.role) {
             this.setState({
-                password : ''
-            });
+                password : '',
+                workerID : ''
+            }, () => this.props.clearError());
         }
     }
 
     handlerSubmit = (e) => {
         e.preventDefault();
-        localStorage.setItem('authenticate', '1');
-        this.props.history.push('/admin');
+        const role = this.state.role.toLowerCase();
+        let userData = {
+            password : this.state.password
+        }
+        if (role === 'worker') {
+            userData = {
+                ...userData,
+                workerID : this.state.workerID
+            } 
+        }
+        this.props.loginUser(userData, role);
+        
     }
     render() {
-        
-        console.log(this.props);
-        
         let workerInput = null;
         let submitCondition = false;
         switch(this.state.role){
@@ -89,7 +107,8 @@ class Login extends Component {
                                 name="password" 
                                 className="form-control"/> 
                             </div>
-                            <button disabled={!submitCondition} style={{marginTop:"20px", width:"100%", height:"40px"}}className="btn btn-primary" type="submit">Login</button> 
+                            { this.props.errors.msg && <p style={{color:'red',fontWeight:600}}>Auth Failed</p>}
+                            <button disabled={!submitCondition} style={{marginTop:"10px", width:"100%", height:"40px"}}className="btn btn-primary" type="submit">Login</button> 
                         </form>
                     </div>                    
                 </div>
@@ -99,4 +118,11 @@ class Login extends Component {
     }
 }
 
-export default Login
+Login.propTypes = {
+    loginUser: PropTypes.func.isRequired,
+    auth: PropTypes.object.isRequired,
+    errors: PropTypes.object.isRequired
+}
+
+
+export default Login;

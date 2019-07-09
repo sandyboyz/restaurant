@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
 import ComponentLogin from '../components/Login';
-import { Auth } from '../util/util';
-import {Redirect} from 'react-router-dom';
+import {connect} from 'react-redux';
+import {loginUser, clearError} from '../actions/authAction';
 
 class Login extends Component {
     render() {
-        if (Auth.authenticate()) return <Redirect to="/admin"/>
         return (
             <React.Fragment>
                 <ComponentLogin {...this.props}/>
@@ -15,4 +14,9 @@ class Login extends Component {
     }
 }
 
-export default Login
+const mapStateToProps = (state) => ({
+    auth: state.auth,
+    errors: state.errors
+});
+
+export default connect(mapStateToProps, {loginUser,clearError})(Login)

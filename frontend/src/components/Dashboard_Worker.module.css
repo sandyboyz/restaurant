@@ -1,0 +1,9 @@
+.container{
+    width:75%
+}
+
+@media only screen and (min-width:481px){
+    .container{
+        width:100%
+    }
+}

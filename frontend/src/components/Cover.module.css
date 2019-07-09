@@ -1,5 +1,5 @@
 .main-container{
-    background-image: url(http://192.168.88.7:3000/images/cover2.jpg);
+    background-image: url(../cover2.jpg);
     background-size: cover;
     height: 100vh;
     overflow: hidden;
@@ -35,7 +35,7 @@
 }
 
 
-.jumbotron > h4, h5 {
+.jumbotron > h4, .jumbotron h5 {
     font-family: "Kalam";
 }
 

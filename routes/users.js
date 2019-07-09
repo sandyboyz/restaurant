@@ -10,9 +10,7 @@ const checkIsAdmin = require("../utils/checkRole");
 const pad = require("../utils/pad");
 
 router.get("/", (req, res) => {
-  Users.find()
-    .then(data => res.status(200).json(data))
-    .catch(e => console.log(e));
+  res.status(403).end("Unauthorized");
 });
 
 router.get("/check-counter", (req, res) => {
@@ -87,6 +85,16 @@ router.post("/login-worker", (req, res) => {
     .catch(e => res.status(401).json({ msg: "Something Wrong" }));
 });
 
+router.post(
+  "/checkToken",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    res.json({
+      auth: true
+    });
+  }
+);
+
 // Need Role-Based Authorization
 // Admin
 router.get(
@@ -94,6 +102,51 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     res.json(req.user);
+  }
+);
+router.get(
+  "/get-worker",
+  passport.authenticate("jwt", { session: false }),
+  checkIsAdmin(),
+  (req, res) => {
+    Users.find({ role: "worker" })
+      .select("-password")
+      .then(data => res.status(200).json(data))
+      .catch(e => console.log(e));
+  }
+);
+
+router.put(
+  "/update-worker/:id",
+  passport.authenticate("jwt", { session: false }),
+  checkIsAdmin(),
+  (req, res) => {
+    const id = req.params.id;
+    Users.findById(id)
+      .then(data => {
+        data.workerName = req.body.workerName;
+        data
+          .save()
+          .then(data => res.json(data))
+          .catch(err => console.log(err));
+      })
+      .catch(e => console.log(e));
+  }
+);
+
+router.delete(
+  "/delete-worker/:id",
+  passport.authenticate("jwt", { session: false }),
+  checkIsAdmin(),
+  (req, res) => {
+    const id = req.params.id;
+    Users.findById(id)
+      .then(data => {
+        data.remove()
+          .then(() => res.json({success: true}))
+          .catch(err => console.log(err));
+      })
+      .catch(e => console.log(e));
   }
 );
 
