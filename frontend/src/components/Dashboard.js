@@ -75,6 +75,12 @@ export class Dashboard extends Component {
       show: !this.state.show
     });
   };
+
+  toggleModalShow = () => {
+    this.setState({
+      modalShow: !this.state.modalShow
+    })
+  }
   componentDidMount() {
     if (this.props.auth.isAuthenticated) {
       setAuthToken(localStorage.jwtToken);
@@ -133,7 +139,7 @@ export class Dashboard extends Component {
           </button>
           {/* {this.state.show ? <div onClick={() => this.toggleMenu()} style={{top:0, left:0, zIndex:2,position:"fixed", height:"100%", width:"100%", backgroundColor:"rgba(255,255,255,0.85)"}}></div>: null} */}
         </div>} />
-        <Route path="/dashboard/worker" render={props => <DashboardWorker {...props} show={this.state.show} modalShow={this.state.modalShow} />} />
+        <Route path="/dashboard/worker" render={props => <DashboardWorker {...props} show={this.state.show} modalShow={this.state.modalShow} toggleModalShow={this.toggleModalShow} />} />
       <Route path="/dashboard/food" render={props => <DashboardFood {...props} show={this.state.show}/>} />
         <Route path="/dashboard/*" render={() => <Redirect to="/dashboard"/>}/>
         </Switch>

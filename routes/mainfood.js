@@ -17,14 +17,23 @@ const upload = multer({ storage: storage });
 router.get("/mainfood", (req, res) => {
   const page = req.query.page || 1;
   const limit = req.query.limit || 4;
-  MainFood.paginate({}, { page: +page, limit: +limit }, (err, result) => {
-    res.json(result);
-  });
+  const priceMin = req.query.priceMin || 0;
+  const priceMax = req.query.priceMax || 500000;
+  const price = priceMin && priceMax ? {$gte: priceMin, $lte: priceMax} : {$gte: 0};
+  const liveSearch =
+    { name: new RegExp(req.query.liveSearch, "i"), price } || {};
+  MainFood.paginate(
+    liveSearch,
+    { page: +page, limit: +limit },
+    (err, result) => {
+      res.json(result);
+    }
+  );
 });
 
 router.post(
   "/mainfood",
-  passport.authenticate('jwt', {session : false}),
+  passport.authenticate("jwt", { session: false }),
   upload.single("productImage"),
   (req, res) => {
     const mainFood = new MainFood({

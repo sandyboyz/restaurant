@@ -7,7 +7,14 @@ export class Dashboard_Worker extends Component {
   state = {
     worker: [],
     name: [],
-    edited: []
+    edited: [],
+    addWorker: {
+      name: "",
+      password: "",
+      confirm: ""
+    },
+    error: [],
+    deleteConfirmId: null
   };
   componentWillMount() {
     if (this.props.auth.user.role !== "admin") {
@@ -38,13 +45,10 @@ export class Dashboard_Worker extends Component {
       })
       .catch(e => console.log(e));
   }
-  //   shouldComponentUpdate(nextProps, prevState) {
-  //     if (this.props.show !== nextProps.show || prevState.worker !== this.state.worker) {
-  //       return true;
-  //     }
-  //     return false;
-  //   }
 
+  /* 
+  NOTE Edit/Delete/View Crud
+  */
   editWorker = id => {
     const originalArray = this.state.edited.filter(data => {
       return data._id !== id;
@@ -137,17 +141,108 @@ export class Dashboard_Worker extends Component {
         axios
           .get(`${localhost}/api/users/get-worker`)
           .then(res => {
-            this.setState({
-              worker: res.data
-            });
+            this.setState(
+              {
+                worker: res.data,
+                deleteConfirmId: null
+              },
+              () => this.props.toggleModalShow()
+            );
           })
           .catch(err => console.log(err));
       })
       .catch(err => console.log(err));
   };
-  //   componentWillReceiveProps(props){
-  //     console.log(props);
-  //   }
+
+  /* 
+  NOTE Add Worker
+  */
+  formOnChange = event => {
+    const addWorker = {
+      ...this.state.addWorker,
+      [event.target.name]: event.target.value
+    };
+    this.setState({
+      addWorker
+    });
+  };
+  formOnClick = () => {
+    let error = [];
+    let errorTrigger = false;
+    if (this.state.addWorker.name.length < 3) {
+      error.push(
+        <h6 key="formname" style={{ color: "red" }}>Name must be minimal 3 character.</h6>
+      );
+      errorTrigger = true;
+    }
+    if (
+      this.state.addWorker.password.length > 0 &&
+      this.state.addWorker.password !== this.state.addWorker.confirm
+    ) {
+      error.push(<h6 key="formpassword" style={{ color: "red" }}>Password must be match.</h6>);
+      errorTrigger = true;
+    }
+
+    if (errorTrigger) {
+      this.setState({
+        error
+      });
+    } else {
+      axios
+        .post(`${localhost}/api/users/register-worker`, {
+          workerName: this.state.addWorker.name,
+          password: this.state.addWorker.password
+        })
+        .then(res => {
+          axios
+            .get(`${localhost}/api/users/get-worker`)
+            .then(res => {
+              const edited = res.data.map(val => {
+                return {
+                  edit: false,
+                  _id: val._id
+                };
+              });
+              const name = res.data.map(val => {
+                return {
+                  name: val.workerName,
+                  _id: val._id
+                };
+              });
+              this.setState({
+                worker: res.data,
+                edited,
+                name,
+                error: [],
+                addWorker: {
+                  name: "",
+                  password: "",
+                  confirm: ""
+                }
+              });
+            })
+            .catch(e => console.log(e));
+        })
+        .catch(e => console.log(e));
+    }
+  };
+  confirmDelete = id => {
+    this.setState(
+      {
+        deleteConfirmId: id
+      },
+      () => this.props.toggleModalShow()
+    );
+  };
+  cancelDelete = () => {
+    this.setState(
+      {
+        delteConfirmId: null
+      },
+      () => this.props.toggleModalShow()
+    );
+  };
+
   render() {
     let workerList = (
       <tr>
@@ -202,7 +297,7 @@ export class Dashboard_Worker extends Component {
                 className="fas fa-edit fa-lg"
               />{" "}
               <i
-                onClick={() => this.deleteWorker(val._id)}
+                onClick={() => this.confirmDelete(val._id)}
                 style={{ color: "red" }}
                 className="fas fa-user-slash fa-lg"
               />
@@ -214,7 +309,10 @@ export class Dashboard_Worker extends Component {
     return (
       <div
         style={{
-          width: this.props.show && isMobile ? "75%" : "100%",
+          width:
+            this.props.show && isMobile && window.innerWidth < 361
+              ? "75%"
+              : "100%",
           padding: "10px 5px"
         }}
       >
@@ -238,18 +336,39 @@ export class Dashboard_Worker extends Component {
         <h2>Add Worker</h2>
         <div className="form-group">
           <label>Name</label>
-          <input className="form-control" type="text" />
+          <input
+            onChange={this.formOnChange}
+            name="name"
+            value={this.state.addWorker.name}
+            className="form-control"
+            type="text"
+          />
         </div>
         <div className="form-group">
           <label>Password</label>
-          <input className="form-control" type="password" />
+          <input
+            onChange={this.formOnChange}
+            name="password"
+            value={this.state.addWorker.password}
+            className="form-control"
+            type="password"
+          />
         </div>
         <div className="form-group">
           <label>Confirm Password</label>
-          <input className="form-control" type="password" />
+          <input
+            onChange={this.formOnChange}
+            name="confirm"
+            value={this.state.addWorker.confirm}
+            className="form-control"
+            type="password"
+          />
         </div>
+        {this.state.error.length > 0 ? this.state.error : null}
         <div className="form-group">
-          <button className="btn btn-primary">ADD</button>
+          <button onClick={this.formOnClick} className="btn btn-primary">
+            ADD
+          </button>
         </div>
         {this.props.modalShow ? (
           <div>
@@ -273,12 +392,14 @@ export class Dashboard_Worker extends Component {
               <p>Proceed Delete?</p>
               <div style={{ textAlign: "right" }}>
                 <button
+                  onClick={() => this.deleteWorker(this.state.deleteConfirmId)}
                   style={{ padding: "10px 30px" }}
                   className="btn btn-warning"
                 >
                   Yes
                 </button>
                 <button
+                  onClick={this.cancelDelete}
                   style={{ padding: "10px 30px" }}
                   className="btn btn-info"
                 >
@@ -287,6 +408,7 @@ export class Dashboard_Worker extends Component {
               </div>
             </div>
             <div
+              onClick={this.cancelDelete}
               style={{
                 position: "fixed",
                 zIndex: 300,

@@ -1,0 +1,21 @@
+.foodcontainer{
+    display: flex;
+}
+
+.foodcontainer > img {
+    width: 60px;
+    height: 60px;
+}
+
+@media only screen and (max-width:420px){
+    .foodcontainer > img {
+        width: 50px;
+        height: 50px;
+    }
+}
+@media only screen and (max-width:320px){
+    .foodcontainer > img {
+        width: 40px;
+        height: 40px;
+    }
+}
