@@ -24,6 +24,16 @@ export class Dashboard_Food extends Component {
     price: {
       min: 0,
       max: 500000
+    },
+    showEditMenu: false,
+    showDeleteMenu: false,
+    currentEdit: {
+      _id: "",
+      name: "",
+      price: "",
+      picture: "",
+      file: null,
+      fileblob: null
     }
   };
 
@@ -37,9 +47,14 @@ export class Dashboard_Food extends Component {
       })
       .catch(err => console.log(err));
   }
+
   onChangeImage = event => {
     let [file] = event.target.files;
-    this.setState({ fileblob: URL.createObjectURL(file), file });
+    if (file !== undefined) {
+      this.setState({ fileblob: URL.createObjectURL(file), file });
+    } else {
+      this.setState({ file: null, fileblob: null });
+    }
   };
   onChangeInput = event => {
     const input = {
@@ -57,15 +72,21 @@ export class Dashboard_Food extends Component {
     axios
       .post(`${localhost}/api/mainfood`, formData)
       .then(res => {
-        this.setState({
-          input: {
-            foodname: "",
-            price: ""
-          },
-          file: null,
-          fileblob: null
-        });
-        console.log(res);
+        axios.get(`${localhost}/api/mainfood?limit=25`).then(res => {
+          this.setState({
+            input: {
+              foodname: "",
+              price: ""
+            },
+            file: null,
+            fileblob: null,
+            read:{
+              ...this.state.read,
+              food: res.data.docs
+            }
+          });
+        }).catch(err => console.log(err))
+        
       })
       .catch(err => console.log(err));
   };
@@ -127,7 +148,294 @@ export class Dashboard_Food extends Component {
       }
     );
   };
+  deleteFoodOnClick = id => {
+    axios
+      .get(`${localhost}/api/mainfood/${id}`)
+      .then(res => {
+        const { _id } = res.data;
+        this.setState({
+          showDeleteMenu: true,
+          currentEdit: {
+            ...this.state.currentEdit,
+            _id
+          }
+        });
+      })
+      .catch(err => console.log(err));
+  };
+  deleteFoodConfirm = id => {
+    axios
+      .delete(`${localhost}/api/mainfood/${id}`)
+      .then(msg => {
+        axios
+          .get(`${localhost}/api/mainfood?limit=25`)
+          .then(res => {
+            this.setState({
+              showDeleteMenu: false,
+              read: {
+                ...this.state.read,
+                food: res.data.docs
+              }
+            });
+          })
+          .catch(err => console.log(err));
+      })
+      .catch(err => console.log(err));
+  };
+  deleteFoodCancel = () => {
+    this.setState({
+      showDeleteMenu: false
+    });
+  };
+  editFoodOnClick = id => {
+    axios
+      .get(`${localhost}/api/mainfood/${id}`)
+      .then(res => {
+        const { _id, name, price, picture } = res.data;
+        this.setState({
+          showEditMenu: true,
+          currentEdit: {
+            ...this.state.currentEdit,
+            _id,
+            name,
+            price,
+            picture
+          }
+        });
+      })
+      .catch(err => console.log(err));
+  };
+  onChangeInputEdit = event => {
+    this.setState({
+      currentEdit: {
+        ...this.state.currentEdit,
+        [event.target.name]: event.target.value
+      }
+    });
+  };
+  onChangeFile = event => {
+    const [file] = event.target.files;
+    console.log(file);
+    if (file !== undefined) {
+      this.setState({
+        currentEdit: {
+          ...this.state.currentEdit,
+          file,
+          fileblob: URL.createObjectURL(file)
+        }
+      });
+    } else {
+      this.setState({
+        currentEdit: {
+          ...this.state.currentEdit,
+          file: null,
+          fileblob: null
+        }
+      });
+    }
+  };
+  onCancelEdit = () => {
+    this.setState({
+      showEditMenu: false,
+      currentEdit: {
+        ...this.state.currentEdit,
+        file: null,
+        fileblob: null
+      }
+    });
+  };
+  onSaveEdit = () => {
+    let formData = new FormData();
+    formData.append("name", this.state.currentEdit.name);
+    formData.append("price", this.state.currentEdit.price);
+    if (
+      this.state.currentEdit.file !== undefined ||
+      this.state.currentEdit.file !== null
+    )
+      formData.append("productImage", this.state.currentEdit.file);
+    axios
+      .put(`${localhost}/api/mainfood/${this.state.currentEdit._id}`, formData)
+      .then(res => {
+        axios
+          .get(`${localhost}/api/mainfood?limit=25`)
+          .then(res => {
+            this.setState({
+              read: {
+                ...this.state.read,
+                food: res.data.docs
+              },
+              showEditMenu: false,
+              currentEdit: {
+                ...this.state.currentEdit,
+                file: null,
+                fileblob: null
+              }
+            });
+          })
+          .catch();
+      })
+      .catch();
+  };
   render() {
+    let deleteMenu = null;
+    if (this.state.showDeleteMenu)
+      deleteMenu = (
+        <div>
+          <div
+            style={{
+              position: "fixed",
+              backgroundColor: "white",
+              zIndex: 301,
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%,-50%)",
+              width: "300px",
+              padding: "10px"
+            }}
+          >
+            <h2 className="text-warning">Warning</h2>
+            <hr />
+            <p>
+              You <strong>cannot</strong> undo deletion process.
+            </p>
+            <p>Proceed Delete?</p>
+            <div style={{ textAlign: "right" }}>
+              <button
+                onClick={() => this.deleteFoodConfirm(this.state.currentEdit._id)}
+                style={{ padding: "10px 30px" }}
+                className="btn btn-warning"
+              >
+                Yes
+              </button>
+              <button
+                onClick={this.deleteFoodCancel}
+                style={{ padding: "10px 30px" }}
+                className="btn btn-info"
+              >
+                No
+              </button>
+            </div>
+          </div>
+          <div
+            onClick={this.deleteFoodCancel}
+            style={{
+              position: "fixed",
+              zIndex: 300,
+              top: 0,
+              left: 0,
+              height: "100%",
+              width: "100%",
+              backgroundColor: "rgba(0,0,0,0.5)"
+            }}
+          />
+        </div>
+      );
+    let editFoodStyle = {
+      width: "450px",
+      height: "500px"
+    };
+    if (isMobile) {
+      editFoodStyle = {
+        width: "100%",
+        height: "100%"
+      };
+    }
+    let editFoodMenu = null;
+    let src = `${localhost}/${this.state.currentEdit.picture}`;
+    if (this.state.currentEdit.file !== null) {
+      src = this.state.currentEdit.fileblob;
+    }
+
+    if (this.state.showEditMenu)
+      editFoodMenu = (
+        <React.Fragment>
+          <div
+            style={{
+              overflowY: "auto",
+              position: "fixed",
+              zIndex: 200,
+              ...editFoodStyle,
+              transform: "translate(-50%,-50%)",
+              backgroundColor: "white",
+              boxShadow: "1px 1px 5px black",
+              left: "50%",
+              top: "50%",
+              padding: "20px",
+              backfaceVisibility: "hidden"
+            }}
+          >
+            <div style={{ display: "flex" }}>
+              <div>
+                <h2>Edit Menu</h2>
+              </div>
+              <div style={{ marginTop: "6px", marginLeft: "auto" }}>
+                <i
+                  onClick={this.onCancelEdit}
+                  style={{ color: "#593196" }}
+                  className="far fa-times-circle fa-2x"
+                />
+              </div>
+            </div>
+            <hr />
+            <div className="form-group">
+              <label>Name</label>
+              <input
+                className="form-control"
+                type="text"
+                name="name"
+                value={this.state.currentEdit.name}
+                onChange={this.onChangeInputEdit}
+              />
+            </div>
+            <div className="form-group">
+              <label>Price</label>
+              <input
+                className="form-control"
+                type="number"
+                name="price"
+                value={this.state.currentEdit.price}
+                onChange={this.onChangeInputEdit}
+              />
+            </div>
+            <div className="form-group">
+              <div>Picture</div>
+              <img
+                alt="food"
+                style={{ width: "100px", height: "100px" }}
+                src={src}
+              />
+
+              <input
+                className="form-control-file"
+                style={{ verticalAlign: "bottom" }}
+                onChange={this.onChangeFile}
+                type="file"
+              />
+            </div>
+            <div className="form-group">
+              <button onClick={this.onSaveEdit} className="btn btn-warning">
+                Save
+              </button>
+              <button onClick={this.onCancelEdit} className="btn btn-primary">
+                Cancel
+              </button>
+            </div>
+          </div>
+          <div
+            onClick={this.onCancelEdit}
+            style={{
+              position: "fixed",
+              zIndex: 199,
+              top: 0,
+              left: 0,
+              height: "100%",
+              width: "100%",
+              backgroundColor: "rgba(0,0,0,0.5)"
+            }}
+          />
+        </React.Fragment>
+      );
+
     let foodList = (
       <tr>
         <td />
@@ -149,8 +457,16 @@ export class Dashboard_Food extends Component {
               </div>
             </td>
             <td>
-              <i style={{ color: "green" }} className="fas fa-edit fa-lg" />{" "}
-              <i style={{ color: "red" }} className="fas fa-user-slash fa-lg" />
+              <i
+                onClick={() => this.editFoodOnClick(val._id)}
+                style={{ color: "green" }}
+                className="fas fa-edit fa-lg"
+              />{" "}
+              <i
+                onClick={() => this.deleteFoodOnClick(val._id)}
+                style={{ color: "red" }}
+                className="fas fa-user-slash fa-lg"
+              />
             </td>
           </tr>
         );
@@ -300,20 +616,8 @@ export class Dashboard_Food extends Component {
             </div>
           </form>
         </div>
-        {/* <div
-          style={{
-            position: "fixed",
-            zIndex: 200,
-            width: "90%",
-            height: "90%",
-            transform: "translate(-50%,-50%)",
-            backgroundColor: "lightgreen",
-            left: "50%",
-            top: "50%"
-          }}
-        >
-          Wawo Saguo
-        </div> */}
+        {editFoodMenu}
+        {deleteMenu}
       </React.Fragment>
     );
   }

@@ -19,7 +19,8 @@ router.get("/mainfood", (req, res) => {
   const limit = req.query.limit || 4;
   const priceMin = req.query.priceMin || 0;
   const priceMax = req.query.priceMax || 500000;
-  const price = priceMin && priceMax ? {$gte: priceMin, $lte: priceMax} : {$gte: 0};
+  const price =
+    priceMin && priceMax ? { $gte: priceMin, $lte: priceMax } : { $gte: 0 };
   const liveSearch =
     { name: new RegExp(req.query.liveSearch, "i"), price } || {};
   MainFood.paginate(
@@ -30,7 +31,49 @@ router.get("/mainfood", (req, res) => {
     }
   );
 });
+router.put(
+  "/mainfood/:id",
+  passport.authenticate("jwt", { session: false }),
+  upload.single("productImage"),
+  (req, res) => {
+    const { id } = req.params;
+    MainFood.findById(id)
+      .then(data => {
+        data.name = req.body.name;
+        data.price = req.body.price;
+        if (req.file !== undefined)
+          data.picture = `uploads/${req.file.filename}`;
 
+        data
+          .save()
+          .then(result => res.json(result))
+          .catch(err => console.log(err));
+      })
+      .catch(err => console.log(err));
+  }
+);
+router.get("/mainfood/:id", (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  MainFood.findById(id)
+    .then(data => res.json(data))
+    .catch(err => console.log(err));
+});
+router.delete(
+  "/mainfood/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { id } = req.params;
+    MainFood.findById(id)
+      .then(data => {
+        data
+          .remove()
+          .then(() => res.json({ sucess: true }))
+          .catch(err => console.log(err));
+      })
+      .catch(err => console.log(err));
+  }
+);
 router.post(
   "/mainfood",
   passport.authenticate("jwt", { session: false }),
