@@ -4,7 +4,13 @@ import { Redirect, Route } from "react-router-dom";
 import { connect } from "react-redux";
 import queryString from "query-string";
 
-export const localhost = "http://192.168.88.250:5000";
+if(process.env.NODE_ENV === "production"){
+  export const localhost = "https://sandy-restaurant.herokuapp.com";
+}
+else {
+  export const localhost = "http://192.168.88.250:5000";
+}
+
 
 export const fetchMainCourses = (activePage, limit) => {
   return axios.get(
