@@ -9,7 +9,7 @@
     "client": "npm start --prefix frontend",
     "client-install": "npm install --prefix frontend",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "npm install --prefix frontend && npm run build --prefix frontend"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix frontend && npm run build --prefix frontend"
   },
   "keywords": [],
   "author": "",
