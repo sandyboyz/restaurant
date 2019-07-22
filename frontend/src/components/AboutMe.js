@@ -217,7 +217,7 @@ export class AboutMe extends Component {
                     <div style={{ marginRight: "10px" }}>
                       <img
                         style={{ width: "55px" }}
-                        src="../../images/logo_ipb.svg"
+                        src="../../images/Logo_IPB.svg"
                         alt="logo-ipb"
                       />
                     </div>
