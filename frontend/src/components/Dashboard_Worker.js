@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import axios from "axios";
 import { localhost } from "../util/util";
 import { isMobile } from "react-device-detect";
+import { toast } from "react-toastify";
 export class Dashboard_Worker extends Component {
   state = {
     worker: [],
@@ -122,6 +123,7 @@ export class Dashboard_Worker extends Component {
         workerName: item.name
       })
       .then(res => {
+        toast.success("Worker Updated");
         axios
           .get(`${localhost}/api/users/get-worker`)
           .then(res => {
@@ -141,13 +143,16 @@ export class Dashboard_Worker extends Component {
         axios
           .get(`${localhost}/api/users/get-worker`)
           .then(res => {
-            this.setState(
-              {
-                worker: res.data,
-                deleteConfirmId: null
-              },
-              () => this.props.toggleModalShow()
-            );
+            toast.success("Worker Deleted");
+            this.props.toggleModalShow(() => {
+              this.setState(
+                {
+                  worker: res.data,
+                  deleteConfirmId: null
+                }
+              );
+            });
+            
           })
           .catch(err => console.log(err));
       })
@@ -183,6 +188,11 @@ export class Dashboard_Worker extends Component {
       errorTrigger = true;
     }
 
+    if( this.state.addWorker.password.length === 0 ){
+      error.push(<h6 key="formpasswordblank" style={{color:"red"}}>Password cannot be blank</h6>)
+      errorTrigger = true;
+    }
+
     if (errorTrigger) {
       this.setState({
         error
@@ -194,6 +204,7 @@ export class Dashboard_Worker extends Component {
           password: this.state.addWorker.password
         })
         .then(res => {
+          toast.success("Worker Added");
           axios
             .get(`${localhost}/api/users/get-worker`)
             .then(res => {
@@ -389,7 +400,7 @@ export class Dashboard_Worker extends Component {
               <p>
                 You <strong>cannot</strong> undo deletion process.
               </p>
-              <p>Proceed Delete?</p>
+              <p>Do you wan to delete <strong>{this.state.worker.filter(val => val._id === this.state.deleteConfirmId)[0].workerID}</strong>?</p>
               <div style={{ textAlign: "right" }}>
                 <button
                   onClick={() => this.deleteWorker(this.state.deleteConfirmId)}

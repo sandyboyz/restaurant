@@ -8,7 +8,7 @@ class Food extends Component {
         return (
             <React.Fragment>
                 <NavigationBar />
-                <MainCourses />
+                <MainCourses {...this.props} />
             </React.Fragment>
             
         )

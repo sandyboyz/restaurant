@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const Users = require("../models/users");
-const Counter = require("../models/counter");
+const Counter = require("../models/counter").Counter;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
@@ -49,7 +49,7 @@ router.post("/login-admin", (req, res) => {
         const payload = {
           role: data.role
         };
-        jwt.sign(payload, "navi", { expiresIn: "30m" }, (err, token) => {
+        jwt.sign(payload, process.env.SECRET_OR_KEY, { expiresIn: "30m" }, (err, token) => {
           res.status(200).json({
             success: true,
             token: "Bearer " + token
@@ -74,7 +74,7 @@ router.post("/login-worker", (req, res) => {
           name: data.workerName,
           role: data.role
         };
-        jwt.sign(payload, "navi", { expiresIn: "30m" }, (err, token) => {
+        jwt.sign(payload, process.env.SECRET_OR_KEY, { expiresIn: "30m" }, (err, token) => {
           res.status(200).json({
             success: true,
             token: "Bearer " + token
@@ -163,6 +163,7 @@ router.post(
     Counter.findOne({ id: "Users" })
       .then(counter => {
         worker.workerID = prefix + pad(counter.seq, 4);
+        if(req.body.password.length < 1) return res.status(400).end("Invalid Register");
         bcrypt.hash(req.body.password, 10, function(err, hash) {
           if (!err) {
             worker.password = hash;

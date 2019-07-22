@@ -1,5 +1,6 @@
 const router = require("express").Router();
-const MainFood = require("../models/mainfood");
+const { MainFood, backup_mainfood } = require("../models/mainfood");
+const Order = require("../models/order");
 const multer = require("multer");
 const passport = require("passport");
 
@@ -13,6 +14,61 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+
+router.get("/order", (req, res) => {
+  Order.find()
+    .then(data => res.json(data))
+    .catch(err => console.log(err));
+});
+
+router.post("/order", (req, res) => {
+  const order = new Order({
+    name: req.body.name,
+    order: req.body.order
+  });
+
+  MainFood.find()
+    .then(data => {
+      let array = [...data];
+      let newOrder = [...order.order];
+      let filter = newOrder.map(order => {
+        let [newArray] = array.filter(val => {
+          if (val._id.equals(order._id)) {
+            return val;
+          }
+        });
+
+        if (newArray !== undefined) {
+          return {
+            ...newArray._doc,
+            quantity: order.quantity
+          };
+        }
+      });
+
+      filter = filter.filter(el => el !== undefined);
+
+      order.order = filter;
+      order.totalPrice = filter.reduce((prev, curr) => {
+        return prev + curr.price * curr.quantity;
+      }, 0);
+      if (order.order.length === 0)
+        return res.status(400).end("Order minimum 1 item");
+      if (order.name.length === 0)
+        return res.status(400).end("Name cannot be empty");
+      if (order.name.length < 3)
+        return res.status(400).end("Name minimal 3 character");
+      if (!/^[-_a-zA-Z]+(\s+[-_a-zA-Z]+)*$/.test(order.name))
+        return res
+          .status(400)
+          .end("Name cannot be number or symbol and space in start/end");
+      order
+        .save()
+        .then(data => res.json(data))
+        .catch(err => res.status(400).end("Invalid Order"));
+    })
+    .catch(err => console.log(err));
+});
 
 router.get("/mainfood", (req, res) => {
   const page = req.query.page || 1;
@@ -31,6 +87,16 @@ router.get("/mainfood", (req, res) => {
     }
   );
 });
+
+router.get("/mainfood/:id", (req, res) => {
+  const { id } = req.params;
+  MainFood.findById(id)
+    .then(data => {
+      res.json(data);
+    })
+    .catch(err => console.log(err));
+});
+
 router.put(
   "/mainfood/:id",
   passport.authenticate("jwt", { session: false }),
@@ -52,13 +118,14 @@ router.put(
       .catch(err => console.log(err));
   }
 );
+
 router.get("/mainfood/:id", (req, res) => {
   const { id } = req.params;
-  console.log(id);
   MainFood.findById(id)
     .then(data => res.json(data))
     .catch(err => console.log(err));
 });
+
 router.delete(
   "/mainfood/:id",
   passport.authenticate("jwt", { session: false }),
@@ -68,7 +135,7 @@ router.delete(
       .then(data => {
         data
           .remove()
-          .then(() => res.json({ sucess: true }))
+          .then(() => res.status(202).end("Deleted Food"))
           .catch(err => console.log(err));
       })
       .catch(err => console.log(err));
@@ -89,7 +156,7 @@ router.post(
     mainFood
       .save()
       .then(data => res.json(data))
-      .catch(e => res.json(e.message));
+      .catch(e => res.status(400).end("Invalid Add Food"));
   }
 );
 

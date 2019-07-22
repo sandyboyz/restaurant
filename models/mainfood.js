@@ -18,4 +18,18 @@ const MainFood = new Schema({
     }
 });
 MainFood.plugin(mongoosePaginate);
-module.exports = mongoose.model('MainFood', MainFood);
+
+const mainfood = mongoose.model('MainFood', MainFood);
+const backup_mainfood = mongoose.model('Backup_MainFood', MainFood);
+
+
+
+// const mongoose2 = require("mongoose");
+// const Schema2 = mongoose2.Schema;
+
+// const MainFood2 = new Schema2({
+
+// });
+
+module.exports = {MainFood: mainfood, backup_mainfood};
+

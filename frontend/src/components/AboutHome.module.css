@@ -1,0 +1,29 @@
+.container {
+  /* background-color: cyan; */
+  display: flex;
+  color: white;
+  font-size: 16px;
+  background-color: #593196;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.item {
+  text-align: center;
+  flex-basis: 50%;
+  padding:0.5em;
+  font-size: 1.1em;
+  color: white;
+}
+.item:hover{
+    color: white;
+    text-decoration: none;
+}
+
+.active {
+    border-bottom: solid 4px #FBD5F9;
+}
+@media only screen and (max-width:600px){
+    .item {
+        font-size: 1em;
+    }
+}

@@ -1,0 +1,47 @@
+.browser-window {
+    text-align: left;
+    margin: auto;
+    margin-top:30px;
+    width: 80%;
+    height: 500px;
+    border-radius: 5px;
+    background-color: #fff;
+  }
+  
+  .browser-window .top-bar {
+    height: 30px;
+    border-radius: 5px 5px 0 0;
+    border-top: thin solid #eaeae9;
+    border-bottom: thin solid #dfdfde;
+    background: linear-gradient(#e7e7e6, #e2e2e1);
+  }
+  
+  .browser-window .circle {
+    height: 12px;
+    width: 12px;
+    display: inline-block;
+    border-radius: 50%;
+    background-color: white;
+  }
+  
+  .browser-window .circles {
+    margin: 5px 11px;
+  }
+  
+  .browser-window .content {
+    margin: 0;
+    width: 100%;
+    font-size:48px;
+    min-height: 10em;
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    border-radius: 0 0 5px 5px;
+    background-color: #fafafa;
+  }
+
+@media only screen and (max-width:600px){
+    .browser-window .content {
+        font-size: 24px;
+    }
+}

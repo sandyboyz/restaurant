@@ -8,16 +8,17 @@ const CounterSchema = new Schema({
 
 const Counter = mongoose.model("Counter", CounterSchema);
 
-function createCounter(id) {
-  Counter.find({ id })
+const createCounter = function(id) {
+  return Counter.find({ id })
     .then(res => {
       if (res.length === 0) {
         Counter.create({ id });
       }
     })
     .catch(e => console.log(e));
-}
+};
+
 
 createCounter("Users");
 
-module.exports = Counter;
+module.exports = { Counter, createCounter };

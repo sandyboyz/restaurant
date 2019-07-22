@@ -13,12 +13,19 @@ export class Sidebar extends Component {
       if (this.props.showContentMenu) {
         display = "flex";
       }
-      let adminFeature = null;
+      let topAdminFeature = null;
+      let bottomAdminFeature = null;
       if (this.props.auth.user.role === "admin") {
-          adminFeature = (<Link to="/dashboard/worker" style={{cursor:"pointer",marginBottom:"10px"}}>
+          topAdminFeature = (<Link to="/dashboard/worker" style={{cursor:"pointer",marginBottom:"10px"}}>
                   <img style={{width:"32px",height:"32px", fill:"white"}} src="../images/chef.svg" alt=""/>
                   <h5 style={{fontWeight:300}}>Worker</h5>
               </Link>)
+      }
+      if (this.props.auth.user.role === "admin") {
+        bottomAdminFeature = (<Link to="/dashboard/settings" style={{cursor:"pointer",marginBottom:"10px"}}>
+        <img style={{width:"32px",height:"32px", fill:"white"}} src="../images/settings-gears.svg" alt=""/>
+        <h5 style={{fontWeight:300}}>Settings</h5>
+    </Link>)
       }
     return (
       
@@ -28,11 +35,16 @@ export class Sidebar extends Component {
                   <img style={{width:"32px",height:"32px", fill:"white"}} src="../images/web-house.svg" alt=""/>
                   <h5 style={{fontWeight:300}}>Home</h5>
               </Link>
-              {adminFeature}
+              {topAdminFeature}
               <Link to="/dashboard/food" style={{cursor:"pointer", marginBottom:"10px"}}>
                   <img style={{width:"32px",height:"32px", fill:"white"}} src="../images/salad.svg" alt=""/>
                   <h5 style={{fontWeight:300}}>Food</h5>
               </Link>
+              <Link to="/dashboard/order" style={{cursor:"pointer", marginBottom:"10px"}}>
+                  <img style={{width:"32px",height:"32px", fill:"white"}} src="../images/shopping-bag.svg" alt=""/>
+                  <h5 style={{fontWeight:300}}>Order</h5>
+              </Link>
+              {bottomAdminFeature}
               <div onClick={this.props.logoutUser}style={{cursor:"pointer",}}>
                   <img style={{width:"32px",height:"32px", fill:"white"}} src="../images/logout.svg" alt=""/>
                   <h5 style={{fontWeight:300}}>Logout</h5>

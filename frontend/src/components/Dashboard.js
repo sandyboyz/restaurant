@@ -8,6 +8,8 @@ import { Swipeable } from "react-swipeable";
 import { Switch, Route, Redirect } from "react-router-dom";
 import DashboardWorker from "./Dashboard_Worker";
 import DashboardFood from "./Dashboard_Food";
+import DashboardOrder from "./DashboardOrder";
+import DashboardSettings from "./DashboardSettings";
 
 const config = {
   trackMouse: true,
@@ -76,11 +78,12 @@ export class Dashboard extends Component {
     });
   };
 
-  toggleModalShow = () => {
+  toggleModalShow = (cb = (f) => f) => {
     this.setState({
       modalShow: !this.state.modalShow
-    })
+    }, cb);
   }
+
   componentDidMount() {
     if (this.props.auth.isAuthenticated) {
       setAuthToken(localStorage.jwtToken);
@@ -141,6 +144,8 @@ export class Dashboard extends Component {
         </div>} />
         <Route path="/dashboard/worker" render={props => <DashboardWorker {...props} show={this.state.show} modalShow={this.state.modalShow} toggleModalShow={this.toggleModalShow} />} />
       <Route path="/dashboard/food" render={props => <DashboardFood {...props} show={this.state.show}/>} />
+        <Route path="/dashboard/order" render={props => <DashboardOrder {...props} show={this.state.show} />}   />
+        <Route path="/dashboard/settings" render={props => <DashboardSettings {...props} show={this.state.show} />}   />
         <Route path="/dashboard/*" render={() => <Redirect to="/dashboard"/>}/>
         </Switch>
         

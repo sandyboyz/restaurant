@@ -17,7 +17,8 @@ const Users = new Schema({
     type: String,
     required: function() {
       return this.role === "worker";
-    }
+    },
+    minLength: 3
   },
   password: {
     type: String,

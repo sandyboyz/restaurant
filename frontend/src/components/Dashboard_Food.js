@@ -5,6 +5,7 @@ import axios from "axios";
 import classes from "./Dashboard_Food.module.css";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
+import { toast } from "react-toastify";
 
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 const Range = createSliderWithTooltip(Slider.Range);
@@ -72,7 +73,9 @@ export class Dashboard_Food extends Component {
     axios
       .post(`${localhost}/api/mainfood`, formData)
       .then(res => {
+        toast.success("Success Add Food");
         axios.get(`${localhost}/api/mainfood?limit=25`).then(res => {
+          
           this.setState({
             input: {
               foodname: "",
@@ -88,7 +91,7 @@ export class Dashboard_Food extends Component {
         }).catch(err => console.log(err))
         
       })
-      .catch(err => console.log(err));
+      .catch(err => toast.error(err.response.data));
   };
   onChangeFilter = event => {
     const filter = event.target.value;
@@ -152,12 +155,13 @@ export class Dashboard_Food extends Component {
     axios
       .get(`${localhost}/api/mainfood/${id}`)
       .then(res => {
-        const { _id } = res.data;
+        const { _id, name } = res.data;
         this.setState({
           showDeleteMenu: true,
           currentEdit: {
             ...this.state.currentEdit,
-            _id
+            _id,
+            name
           }
         });
       })
@@ -167,6 +171,7 @@ export class Dashboard_Food extends Component {
     axios
       .delete(`${localhost}/api/mainfood/${id}`)
       .then(msg => {
+        toast.success(msg.data);
         axios
           .get(`${localhost}/api/mainfood?limit=25`)
           .then(res => {
@@ -256,6 +261,7 @@ export class Dashboard_Food extends Component {
     axios
       .put(`${localhost}/api/mainfood/${this.state.currentEdit._id}`, formData)
       .then(res => {
+        toast.success("Updated Food");
         axios
           .get(`${localhost}/api/mainfood?limit=25`)
           .then(res => {
@@ -298,7 +304,7 @@ export class Dashboard_Food extends Component {
             <p>
               You <strong>cannot</strong> undo deletion process.
             </p>
-            <p>Proceed Delete?</p>
+            <p>Do you want to delete <strong>{this.state.currentEdit.name}</strong>?</p>
             <div style={{ textAlign: "right" }}>
               <button
                 onClick={() => this.deleteFoodConfirm(this.state.currentEdit._id)}
@@ -494,7 +500,6 @@ export class Dashboard_Food extends Component {
               className="form-control"
               type="text"
             />
-            <button className="btn btn-info">Clear</button>
           </div>
           <br />
           <div style={{ maxWidth: 280 }}>
