@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const mongoose2 = require("mongoose");
+const path = require("path");
 const passport = require("passport");
 
 const app = express();
@@ -40,6 +40,13 @@ require("./config/passport")(passport);
 app.use("/api", mainfood);
 app.use("/api/users", users);
 app.use("/api/super", _super);
+
+if(process.env.NODE_ENV === "production"){
+  app.use(express.static('frontend/build'));
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
+  });
+};
 
 http.listen(port, () => console.log(`App running at port ${port}`));
 
