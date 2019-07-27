@@ -73,7 +73,7 @@ export class AboutMe extends Component {
                   className="fas fa-lg fa-envelope"
                 />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.linkedin.com/in/muhammad-sandy-gunawan-4734b3107/" target="_blank" rel="noopener noreferrer">
                 <i
                   style={{
                     marginRight: "3px",
@@ -85,7 +85,7 @@ export class AboutMe extends Component {
                   className="fab fa-lg fa-linkedin-in"
                 />
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.facebook.com/sandyz.boyz" target="_blank" rel="noopener noreferrer">
                 <i
                   style={{
                     color: "white",
