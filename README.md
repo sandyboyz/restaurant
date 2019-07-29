@@ -1,2 +1,2 @@
 # RESTaurant
-### React SPA Project with Express Backend API
+#### React SPA Project with Express Backend API
