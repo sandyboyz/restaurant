@@ -9,7 +9,7 @@ export let localhost;
 if(process.env.NODE_ENV === "production"){
   localhost = "https://z0386f2a9-gtw.qovery.io";
 } else {
-  localhost = "http://192.168.88.250:5000";
+  localhost = "http://localhost:5000";
 }
 
 export const fetchMainCourses = (activePage, limit) => {
