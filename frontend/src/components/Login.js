@@ -198,7 +198,7 @@ class Login extends Component {
                 clientId="123158523971-j8e7h4g9jhnm2ofaf3o0qg7acb489irc.apps.googleusercontent.com"
               />
               <FacebookLogin
-                appId="2464968617055403"
+                appId="2294734287228359"
                 fields="name,email,picture"
                 callback={this.facebookResponse}
                 onFailure={(err) => console.log(err)}
