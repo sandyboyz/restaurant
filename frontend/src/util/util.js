@@ -7,7 +7,7 @@ import queryString from "query-string";
 export let localhost;
 
 if(process.env.NODE_ENV === "production"){
-  localhost = "https://z0386f2a9-gtw.qovery.io";
+  localhost = "https://api.restaurant.muhammadsandy.com";
 } else {
   localhost = "http://localhost:5000";
 }
